@@ -24,10 +24,11 @@ jobs:
           mkdir target/dependency
           (cd target/dependency; jar -xf ../*.jar)
           docker build . -t rso23.azurecr.io/riotapi:latest
-      - name: Push image to Azure
+      - name: Login to Azure
         uses: azure/docker-login@v1
         with:
           login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Push docker image to Azure
         run: docker push rso23.azurecr.io/riotapi:latest
