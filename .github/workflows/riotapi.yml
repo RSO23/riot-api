@@ -16,8 +16,8 @@ jobs:
         with:
           java-version: 11
       - name: Build & Test with Maven
-        run: mvn -B test --file pom.xml
-      - shell: bash
+      - run: mvn -B test --file pom.xml
+      - name: Build a Docker image
       - run: mkdir target/dependency
       - run: (cd target/dependency; jar -xf ../*.jar)
       - run: docker build -t riotapi:latest
