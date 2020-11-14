@@ -2,7 +2,7 @@ name: Riot API
 
 on:
   push:
-    branches: [ dev ]
+    branches: [ main ]
 
 
 jobs:
