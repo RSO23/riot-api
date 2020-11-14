@@ -1,2 +1,4 @@
 server:
   port: ${PORT:8082}
+
+isProd: ${IS_PROD:false}

@@ -17,7 +17,10 @@ jobs:
           java-version: 11
       - name: Build & Test with Maven
         run: mvn -B test --file pom.xml
+      - name: Package with Maven
+        run: mvn -DIS_PROD=true package -B --file pom.xml
       - name: Build a Docker image
-        run: mkdir target/dependency
-      - run: (cd target/dependency; jar -xf ../*.jar)
-      - run: docker build -t riotapi:latest
+        run: |
+          mkdir target/dependency
+          (cd target/dependency; jar -xf ../*.jar)
+          docker build -t riotapi:latest

@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "isProd",
+      "type": "java.lang.Boolean",
+      "description": "Defines whether the app is in production mode or not."
+  }
+] }
