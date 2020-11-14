@@ -23,4 +23,4 @@ jobs:
         run: |
           mkdir target/dependency
           (cd target/dependency; jar -xf ../*.jar)
-          docker build -t riotapi:latest
+          docker build . -t riotapi:latest
