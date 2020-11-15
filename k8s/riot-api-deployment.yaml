@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: riot-api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: riot-api
+  template:
+    metadata:
+      labels:
+        app: riot-api
+    spec:
+      containers:
+        - image: rso23.azurecr.io/riotapi:latest
+          name: riot-api
+          env:
+            - name: IS_PROD
+              value: True
+          ports:
+            - containerPort: 8082
+              name: server
+              protocol: TCP
+          imagePullPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: riot-api
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8082
+      protocol: TCP
+      targetPort: server
+  selector:
+    app: riot-api
