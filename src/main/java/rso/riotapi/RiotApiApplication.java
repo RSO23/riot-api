@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 public class RiotApiApplication {
 
 	@Bean
-	public RestTemplate gerRestTemplate() {
+	public RestTemplate getRestTemplate() {
 		HttpComponentsClientHttpRequestFactory httpComponentsClientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
 		httpComponentsClientHttpRequestFactory.setConnectTimeout(10000);
 		return new RestTemplate();

@@ -15,9 +15,6 @@ spec:
       containers:
         - image: rso23.azurecr.io/riotapi:latest
           name: riot-api
-          env:
-            - name: IS_PROD
-              value: True
           ports:
             - containerPort: 8082
               name: server
