@@ -13,7 +13,7 @@ spec:
         app: riot-api
     spec:
       containers:
-        - image: rso23.azurecr.io/riotapi:latest
+        - image: blarc/rso-riotapi:latest
           name: riot-api
           ports:
             - containerPort: 8082
@@ -28,7 +28,7 @@ kind: Service
 metadata:
   name: riot-api
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - port: 8082
       protocol: TCP
