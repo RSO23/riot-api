@@ -19,7 +19,7 @@ spec:
             backend:
               serviceName: data-catalogue
               servicePort: 8081
-          - path: /prediction(/|$)(.*)
+          - path: /predictions(/|$)(.*)
             backend:
               serviceName: prediction
-              servicePort: 8081
+              servicePort: 8083
