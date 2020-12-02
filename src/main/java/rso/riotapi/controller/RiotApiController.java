@@ -1,23 +1,25 @@
 package rso.riotapi.controller;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import rso.riotapi.dto.MatchReferenceDto;
-import rso.riotapi.dto.SummonerDto;
-import rso.riotapi.service.RiotApiService;
+import rso.riotapi.dto.ChampionRatesDto;
+import rso.riotapi.service.ChampionsApiService;
 
 @RestController
 public class RiotApiController
 {
-    private RiotApiService riotApiService;
+    private final ChampionsApiService championsApiService;
 
     @Autowired
-    public RiotApiController(RiotApiService riotApiService)
+    public RiotApiController(ChampionsApiService championsApiService)
     {
-        this.riotApiService = riotApiService;
+        this.championsApiService = championsApiService;
     }
 
     @GetMapping("/ping")
@@ -25,13 +27,13 @@ public class RiotApiController
         return "Pong!";
     }
 
-    @GetMapping("/summoner/{username}")
-    public SummonerDto getSummoner(@PathVariable("username") String username) {
-        return riotApiService.getSummonerByName(username);
+    @GetMapping("/championRates")
+    public Map<String, LinkedHashMap> getChampionRates() {
+        return championsApiService.getChampionRates();
     }
 
-    @GetMapping("/matches/{accountId}")
-    public MatchReferenceDto[] getMatchReferences(@PathVariable("accountId") String accountId) {
-        return riotApiService.getMatchReferences(accountId);
+    @GetMapping("/championRates2")
+    public List<ChampionRatesDto> getChampionRates2() {
+        return championsApiService.getChampionRates2();
     }
 }
