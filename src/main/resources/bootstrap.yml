@@ -1,0 +1,9 @@
+spring:
+  cloud:
+    consul:
+      host: localhost
+      discovery:
+        fail-fast: false
+    service-registry:
+      auto-registration:
+        fail-fast: false
