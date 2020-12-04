@@ -8,7 +8,7 @@ spring:
     name: riot-api
   cloud:
     consul:
-      host: consul-consul-server
+      host: ${CONSUL_HOST:localhost}
       discovery:
         prefer-ip-address: true
 

@@ -20,7 +20,7 @@ jobs:
           mvn -B test --file pom.xml
       - name: Package with Maven
         run: |
-          mvn -DIS_PROD=true package -B --file pom.xml
+          mvn -DIS_PROD=true -DCONSUL_HOST=consul-consul-server package -B --file pom.xml
       - name: Build a Docker image
         run: |
           mkdir target/dependency
