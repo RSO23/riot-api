@@ -17,10 +17,10 @@ jobs:
           java-version: 11
       - name: Build & Test with Maven
         run: |
-          mvn -B test --file pom.xml
+          mvn -Dspring.profiles.active=prod test -B --file pom.xml
       - name: Package with Maven
         run: |
-          mvn -DIS_PROD=true -DCONSUL_HOST=consul-consul-server package -B --file pom.xml
+          mvn -Dspring.profiles.active=prod package -B --file pom.xml
       - name: Build a Docker image
         run: |
           mkdir target/dependency

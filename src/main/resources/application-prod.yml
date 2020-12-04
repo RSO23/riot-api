@@ -1,0 +1,9 @@
+isProd: true
+
+server:
+  port: 0
+
+spring:
+  cloud:
+    consul:
+      host: consul-consul-server
