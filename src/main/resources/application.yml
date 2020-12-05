@@ -3,19 +3,6 @@ isProd: false
 server:
   port: 8082
 
-spring:
-  application:
-    name: riot-api
-  cloud:
-    consul:
-      host: localhost
-      config:
-        fail-fast: false
-        format: yaml
-      discovery:
-        fail-fast: false
-        prefer-ip-address: true
-
 # Show details of health endpoint
 management:
   endpoint:
@@ -28,3 +15,9 @@ management:
       enabled: true
     db:
       enabled: true
+
+---
+spring:
+  profiles: prod
+
+isProd: true
