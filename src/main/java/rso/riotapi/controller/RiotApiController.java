@@ -4,27 +4,30 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.RequiredArgsConstructor;
+import rso.riotapi.config.ConfigProperties;
 import rso.riotapi.dto.ChampionRatesDto;
 import rso.riotapi.service.ChampionsApiService;
 
 @RestController
+@RequiredArgsConstructor
 public class RiotApiController
 {
-    private final ChampionsApiService championsApiService;
+    private final ConfigProperties configProperties;
 
-    @Autowired
-    public RiotApiController(ChampionsApiService championsApiService)
-    {
-        this.championsApiService = championsApiService;
-    }
+    private final ChampionsApiService championsApiService;
 
     @GetMapping("/ping")
     public String ping() {
         return "Pong!";
+    }
+
+    @GetMapping("/config")
+    public String testConfig() {
+        return configProperties.getTestConfig();
     }
 
     @GetMapping("/championRates")
