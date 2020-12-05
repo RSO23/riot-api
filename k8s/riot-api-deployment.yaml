@@ -7,6 +7,10 @@ spec:
   selector:
     matchLabels:
       app: riot-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
   template:
     metadata:
       labels:
@@ -20,6 +24,18 @@ spec:
               name: server
               protocol: TCP
           imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: server
+            initialDelaySeconds: 20
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: server
+            initialDelaySeconds: 20
+            periodSeconds: 3
 
 ---
 
