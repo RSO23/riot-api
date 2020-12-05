@@ -1,8 +1,5 @@
 isProd: true
 
-server:
-  port: 0
-
 spring:
   cloud:
     consul:
