@@ -3,6 +3,10 @@ isProd: false
 server:
   port: 8082
 
+spring:
+  application:
+    name: riot-api
+
 # Show details of health endpoint
 management:
   endpoint:
