@@ -15,10 +15,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Build & Test with Maven
-        run: |
-          mvn -Dspring.profiles.active=prod test -B --file pom.xml
-      - name: Package with Maven
+      - name: Build & Test & Package with Maven
         run: |
           mvn -Dspring.profiles.active=prod package -B --file pom.xml
       - name: Build a Docker image

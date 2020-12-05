@@ -10,10 +10,10 @@ spring:
     consul:
       host: localhost
       config:
-        fail-fast: true
+        fail-fast: false
         format: yaml
       discovery:
-        fail-fast: true
+        fail-fast: false
         prefer-ip-address: true
 
 # Show details of health endpoint
