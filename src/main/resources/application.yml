@@ -6,6 +6,10 @@ server:
 spring:
   application:
     name: riot-api
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
 
 # Show details of health endpoint
 management:
