@@ -51,7 +51,7 @@ public class RiotApiApplication {
 	public Docket swaggerConfig() {
 		return new Docket(DocumentationType.SWAGGER_2)
 				.select()
-				.apis(RequestHandlerSelectors.basePackage("rso.datacatalogue"))
+				.apis(RequestHandlerSelectors.basePackage("rso.riotapi"))
 				.paths(PathSelectors.any())
 				.build()
 				.securitySchemes(List.of(apiKey()))
@@ -60,7 +60,7 @@ public class RiotApiApplication {
 
 	private ApiInfo apiDetails() {
 		return new ApiInfo(
-				"Data catalogue API",
+				"Riot api API",
 				"This is a private API for League of Legends predictor application",
 				"1.0",
 				"Students license",
