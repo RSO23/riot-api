@@ -17,7 +17,7 @@ spec:
         app: riot-api
     spec:
       containers:
-        - image: blarc/rso-riotapi:latest
+        - image: blarc/rso-riotapi:f388814
           name: riot-api
           ports:
             - containerPort: 8082
@@ -28,13 +28,13 @@ spec:
             httpGet:
               path: /actuator/health/liveness
               port: server
-            initialDelaySeconds: 90
+            initialDelaySeconds: 180
             periodSeconds: 3
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: server
-            initialDelaySeconds: 90
+            initialDelaySeconds: 180
             periodSeconds: 3
 
 ---

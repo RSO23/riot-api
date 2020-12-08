@@ -34,6 +34,6 @@ spring:
 
 my:
   swagger:
-    prefix: riot-api
+    prefix: /riot-api
 
 isProd: true
