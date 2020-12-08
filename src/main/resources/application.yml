@@ -3,6 +3,10 @@ isProd: false
 server:
   port: 8082
 
+my:
+  swagger:
+    prefix:
+
 spring:
   application:
     name: riot-api
@@ -27,5 +31,9 @@ management:
 ---
 spring:
   profiles: prod
+
+my:
+  swagger:
+    prefix: riot-api
 
 isProd: true
