@@ -23,3 +23,7 @@ spec:
             backend:
               serviceName: prediction
               servicePort: 8083
+          - path: /user-catalogue(/|$)(.*)
+            backend:
+              serviceName: user-catalogue
+              servicePort: 8084
