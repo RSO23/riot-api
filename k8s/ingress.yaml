@@ -27,3 +27,7 @@ spec:
             backend:
               serviceName: user-catalogue
               servicePort: 8084
+          - path: /authorization(/|$)(.*)
+            backend:
+              serviceName: authorization
+              servicePort: 8085
