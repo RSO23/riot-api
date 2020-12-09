@@ -11,14 +11,14 @@ spec:
   rules:
     - http:
         paths:
-          - path: /riot-api(/|$)(.*)
-            backend:
-              serviceName: riot-api
-              servicePort: 8082
           - path: /data-catalogue(/|$)(.*)
             backend:
               serviceName: data-catalogue
               servicePort: 8081
+          - path: /riot-api(/|$)(.*)
+            backend:
+              serviceName: riot-api
+              servicePort: 8082
           - path: /prediction(/|$)(.*)
             backend:
               serviceName: prediction
@@ -31,3 +31,7 @@ spec:
             backend:
               serviceName: authorization
               servicePort: 8085
+          - path: /prediction-catalogue(/|$)(.*)
+            backend:
+              serviceName: prediction-catalogue
+              servicePort: 8086
