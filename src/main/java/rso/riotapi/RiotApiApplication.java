@@ -28,7 +28,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableFeignClients
 @SpringBootApplication
 @ConfigurationPropertiesScan
-@EnableDiscoveryClient
 @EnableSwagger2
 public class RiotApiApplication {
 
