@@ -1,16 +1,12 @@
-package rso.riotapi.dto;
+package rso.riotapi.dto.championRates;
 
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 import rso.riotapi.enums.RoleEnum;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
 public class ChampionRatesDto
 {

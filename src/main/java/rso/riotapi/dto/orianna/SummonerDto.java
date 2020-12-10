@@ -1,14 +1,10 @@
-package rso.riotapi.dto;
+package rso.riotapi.dto.orianna;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 public class SummonerDto
 {
     @JsonProperty("id")
@@ -21,8 +17,6 @@ public class SummonerDto
     private String name;
     @JsonProperty("profileIconId")
     private Integer profileIconId;
-    @JsonProperty("revisionDate")
-    private Long revisionDate;
     @JsonProperty("summonerLevel")
     private Integer summonerLevel;
 

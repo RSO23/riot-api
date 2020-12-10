@@ -12,8 +12,8 @@ import org.springframework.web.client.RestTemplate;
 
 import lombok.RequiredArgsConstructor;
 import rso.riotapi.config.ConfigRiotApi;
-import rso.riotapi.dto.ChampionRatesDto;
-import rso.riotapi.dto.ChampionRatesRoleDto;
+import rso.riotapi.dto.championRates.ChampionRatesDto;
+import rso.riotapi.dto.championRates.ChampionRatesRoleDto;
 import rso.riotapi.enums.RoleEnum;
 
 @Service

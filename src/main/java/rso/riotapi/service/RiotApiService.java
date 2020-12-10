@@ -1,5 +1,10 @@
 package rso.riotapi.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -9,39 +14,86 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import rso.riotapi.dto.MatchReferenceDto;
-import rso.riotapi.dto.MatchlistDto;
-import rso.riotapi.dto.SummonerDto;
+import com.merakianalytics.orianna.Orianna;
+import com.merakianalytics.orianna.types.core.summoner.Summoner;
+
+import lombok.RequiredArgsConstructor;
+import rso.riotapi.config.ConfigRiotApi;
+import rso.riotapi.dto.orianna.MatchDto;
+import rso.riotapi.dto.orianna.ParticipantDto;
+import rso.riotapi.dto.requests.MatchesRegionDto;
+import rso.riotapi.dto.riotApi.MatchlistDto;
+import rso.riotapi.dto.orianna.SummonerDto;
+import rso.riotapi.dto.requests.UsernameRegionDto;
 
 @Service
+@RequiredArgsConstructor
 public class RiotApiService
 {
     private static final Logger log = LoggerFactory.getLogger(RiotApiService.class);
-    private static final String API_TOKEN = "RGAPI-71d4caf7-d817-4d55-94be-fabb465f5749";
     private static final String API_BASE_URL = "https://euw1.api.riotgames.com/lol/";
-    private static final String SUMMONER_BY_NAME_URL = "summoner/v4/summoners/by-name/%s";
-    private static final String MATCH_BY_ID_URL = "match/v4/matches/%s";
     private static final String MATCH_LISTS_BY_ENCRYPTED_ACCOUNT_ID_URL = "match/v4/matchlists/by-account/%s";
+
+    private final ConfigRiotApi configRiotApi;
 
     private final RestTemplate restTemplate;
 
-    public RiotApiService(RestTemplate restTemplate)
+
+    public SummonerDto getSummonerByName(UsernameRegionDto usernameRegionDto)
     {
-        this.restTemplate = restTemplate;
+        Orianna.setDefaultRegion(usernameRegionDto.getRegion());
+
+        Summoner summoner = Orianna.summonerNamed(usernameRegionDto.getUsername()).get();
+
+        SummonerDto summonerDto = new SummonerDto();
+        summonerDto.setId(summoner.getId());
+        summonerDto.setAccountId(summoner.getAccountId());
+        summonerDto.setName(summoner.getName());
+        summonerDto.setPuuid(summoner.getPuuid());
+        summonerDto.setProfileIconId(summoner.getProfileIcon().getId());
+        summonerDto.setSummonerLevel(summoner.getLevel());
+
+        return summonerDto;
     }
 
-    public SummonerDto getSummonerByName(String username)
-    {
-        String url = createURL(SUMMONER_BY_NAME_URL, username);
-        ResponseEntity<SummonerDto> response = createRequest(url, SummonerDto.class);
-        return response.getBody();
-    }
-
-    public MatchReferenceDto[] getMatchReferences(String accountId)
+    public MatchlistDto getMatchReferences(String accountId)
     {
         String url = createURL(MATCH_LISTS_BY_ENCRYPTED_ACCOUNT_ID_URL, accountId);
         ResponseEntity<MatchlistDto> response = createRequest(url, MatchlistDto.class);
-        return response.getBody().getMatches();
+        return response.getBody();
+    }
+
+    public List<MatchDto> getMatchByIds(MatchesRegionDto matchesRegionDto)
+    {
+        Orianna.setDefaultRegion(matchesRegionDto.getRegion());
+
+        return Orianna.matchesWithIds(matchesRegionDto.getMatchIds()).get().stream()
+                .map(match -> {
+                    MatchDto matchDto = new MatchDto();
+                    matchDto.setGameId(match.getId());
+                    matchDto.setGameDuration(match.getDuration().getStandardSeconds());
+
+                    matchDto.setTeams(Map.of(100, new ArrayList<>(), 200, new ArrayList<>()));
+
+                    match.getParticipants().forEach(participant -> {
+                        ParticipantDto participantDto = new ParticipantDto();
+                        participantDto.setChampionId(participant.getChampion().getId());
+                        participantDto.setProfileIcon(participant.getProfileIcon().getId());
+                        participantDto.setKills(participant.getStats().getKills());
+                        participantDto.setAssists(participant.getStats().getAssists());
+                        participantDto.setDeaths(participant.getStats().getDeaths());
+                        participantDto.setLargestMultiKill(participant.getStats().getLargestMultiKill());
+                        participantDto.setWin(participant.getStats().isWinner());
+
+                        Summoner summoner = participant.getSummoner();
+                        participantDto.setUsername(summoner.getName());
+                        participantDto.setAccountId(summoner.getAccountId());
+
+                        int teamId = participant.getTeam().getSide().getId();
+                        matchDto.getTeams().get(teamId).add(participantDto);
+                    });
+                    return matchDto;
+                }).collect(Collectors.toList());
     }
 
     private String createURL(String url, String parameter)
@@ -52,10 +104,10 @@ public class RiotApiService
 
     private <T> ResponseEntity<T> createRequest(String url, Class<T> clazz) {
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("X-Riot-Token", API_TOKEN);
+        httpHeaders.add("X-Riot-Token", configRiotApi.getRiotApiKey());
 
         HttpEntity<String> httpEntity = new HttpEntity<>("body", httpHeaders);
-        log.info("Creating request for: " + url);
+        log.info("Making GET request to: " + url);
         return restTemplate.exchange(url, HttpMethod.GET, httpEntity, clazz);
     }
 

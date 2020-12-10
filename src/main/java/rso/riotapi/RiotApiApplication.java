@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -16,6 +17,13 @@ import org.springframework.context.event.EventListener;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
+import com.merakianalytics.orianna.Orianna;
+import com.merakianalytics.orianna.datapipeline.riotapi.RiotAPI;
+import com.merakianalytics.orianna.datastores.mongo.dto.MongoDBDataStore;
+import com.merakianalytics.orianna.types.common.Region;
+
+import lombok.RequiredArgsConstructor;
+import rso.riotapi.config.ConfigRiotApi;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
@@ -23,6 +31,12 @@ import springfox.documentation.service.ApiKey;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.web.DocExpansion;
+import springfox.documentation.swagger.web.ModelRendering;
+import springfox.documentation.swagger.web.OperationsSorter;
+import springfox.documentation.swagger.web.TagsSorter;
+import springfox.documentation.swagger.web.UiConfiguration;
+import springfox.documentation.swagger.web.UiConfigurationBuilder;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @EnableFeignClients
@@ -30,7 +44,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @ConfigurationPropertiesScan
 @EnableSwagger2
 @EnableDiscoveryClient
+@RequiredArgsConstructor
 public class RiotApiApplication {
+
+	private final ConfigRiotApi configRiotApi;
 
 	@Bean
 	public RestTemplate getRestTemplate() {
@@ -47,6 +64,7 @@ public class RiotApiApplication {
 	public void contextRefreshEvent(ContextRefreshedEvent contextRefreshedEvent) {
 		ApplicationContext applicationContext = contextRefreshedEvent.getApplicationContext();
 		MDC.put("applicationName", applicationContext.getId());
+		Orianna.setRiotAPIKey(configRiotApi.getRiotApiKey());
 	}
 
 	@Bean
@@ -58,6 +76,27 @@ public class RiotApiApplication {
 				.build()
 				.securitySchemes(List.of(apiKey()))
 				.apiInfo(apiDetails());
+	}
+
+	@Bean
+	public UiConfiguration uiConfig()
+	{
+		return UiConfigurationBuilder.builder()
+				.deepLinking(true)
+				.operationsSorter(OperationsSorter.METHOD)
+				.displayOperationId(false)
+				.defaultModelExpandDepth(1)
+				.defaultModelsExpandDepth(1)
+				.defaultModelRendering(ModelRendering.EXAMPLE)
+				.displayRequestDuration(true)
+				.docExpansion(DocExpansion.LIST)
+				.filter(false)
+				.maxDisplayedTags(null)
+				.showExtensions(true)
+				.tagsSorter(TagsSorter.ALPHA)
+				.supportedSubmitMethods(UiConfiguration.Constants.DEFAULT_SUBMIT_METHODS)
+				.validatorUrl(null)
+				.build();
 	}
 
 	private ApiInfo apiDetails() {

@@ -1,14 +1,11 @@
-package rso.riotapi.dto;
+package rso.riotapi.dto.riotApi;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
+import rso.riotapi.dto.riotApi.MatchReferenceDto;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 public class MatchlistDto
 {
     @JsonProperty("startIndex")
