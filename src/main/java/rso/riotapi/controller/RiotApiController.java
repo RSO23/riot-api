@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,20 +45,23 @@ public class RiotApiController
         return configProperties.getTestConfig();
     }
 
-    @GetMapping("/summoner")
-    public SummonerDto getSummonerByUsername(UsernameRegionDto usernameRegionDto)
+    @PostMapping("/summoner")
+    public SummonerDto getSummonerByUsername(@RequestBody UsernameRegionDto usernameRegionDto)
     {
+        log.info("getSummonerByUsername called for username: " + usernameRegionDto.getUsername());
         return riotApiService.getSummonerByName(usernameRegionDto);
     }
 
     @GetMapping("/matches/references/{accountId}")
     public MatchlistDto getMatchReferencesByAccountId(@PathVariable String accountId)
     {
+        log.info("getMatchReferencesByAccountId called");
         return riotApiService.getMatchReferences(accountId);
     }
 
     @PostMapping("/matches")
-    public List<MatchDto> getMatchesByIds(MatchesRegionDto matchesRegionDto) {
+    public List<MatchDto> getMatchesByIds(@RequestBody MatchesRegionDto matchesRegionDto) {
+        log.info("getMatchesByIds called");
         return riotApiService.getMatchByIds(matchesRegionDto);
     }
 }

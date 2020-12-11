@@ -1,8 +1,9 @@
 package rso.riotapi.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -15,16 +16,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.merakianalytics.orianna.Orianna;
+import com.merakianalytics.orianna.types.common.Region;
 import com.merakianalytics.orianna.types.core.summoner.Summoner;
 
 import lombok.RequiredArgsConstructor;
 import rso.riotapi.config.ConfigRiotApi;
 import rso.riotapi.dto.orianna.MatchDto;
 import rso.riotapi.dto.orianna.ParticipantDto;
-import rso.riotapi.dto.requests.MatchesRegionDto;
-import rso.riotapi.dto.riotApi.MatchlistDto;
 import rso.riotapi.dto.orianna.SummonerDto;
+import rso.riotapi.dto.requests.MatchesRegionDto;
 import rso.riotapi.dto.requests.UsernameRegionDto;
+import rso.riotapi.dto.riotApi.MatchlistDto;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +43,9 @@ public class RiotApiService
 
     public SummonerDto getSummonerByName(UsernameRegionDto usernameRegionDto)
     {
-        Orianna.setDefaultRegion(usernameRegionDto.getRegion());
+
+        Region region = Optional.ofNullable(usernameRegionDto.getRegion()).orElse(Region.EUROPE_WEST);
+        Orianna.setDefaultRegion(region);
 
         Summoner summoner = Orianna.summonerNamed(usernameRegionDto.getUsername()).get();
 
@@ -58,22 +62,26 @@ public class RiotApiService
 
     public MatchlistDto getMatchReferences(String accountId)
     {
+        // TODO @jakobm Dodaj start/end index
         String url = createURL(MATCH_LISTS_BY_ENCRYPTED_ACCOUNT_ID_URL, accountId);
         ResponseEntity<MatchlistDto> response = createRequest(url, MatchlistDto.class);
-        return response.getBody();
+        MatchlistDto matchlistDto = response.getBody();
+        matchlistDto.setMatches(Arrays.copyOfRange(matchlistDto.getMatches(), 0, 20));
+
+        return matchlistDto;
     }
 
     public List<MatchDto> getMatchByIds(MatchesRegionDto matchesRegionDto)
     {
-        Orianna.setDefaultRegion(matchesRegionDto.getRegion());
+        Optional.ofNullable(matchesRegionDto.getRegion())
+                .ifPresentOrElse(Orianna::setDefaultRegion, () -> Orianna.setDefaultRegion(Region.EUROPE_WEST));
 
         return Orianna.matchesWithIds(matchesRegionDto.getMatchIds()).get().stream()
                 .map(match -> {
                     MatchDto matchDto = new MatchDto();
                     matchDto.setGameId(match.getId());
-                    matchDto.setGameDuration(match.getDuration().getStandardSeconds());
-
-                    matchDto.setTeams(Map.of(100, new ArrayList<>(), 200, new ArrayList<>()));
+                    matchDto.setDuration(match.getDuration().getStandardSeconds());
+                    ArrayList<ParticipantDto> participants = new ArrayList<>();
 
                     match.getParticipants().forEach(participant -> {
                         ParticipantDto participantDto = new ParticipantDto();
@@ -84,14 +92,16 @@ public class RiotApiService
                         participantDto.setDeaths(participant.getStats().getDeaths());
                         participantDto.setLargestMultiKill(participant.getStats().getLargestMultiKill());
                         participantDto.setWin(participant.getStats().isWinner());
+                        participantDto.setTeamId(participant.getTeam().getSide().getId());
 
                         Summoner summoner = participant.getSummoner();
                         participantDto.setUsername(summoner.getName());
                         participantDto.setAccountId(summoner.getAccountId());
 
-                        int teamId = participant.getTeam().getSide().getId();
-                        matchDto.getTeams().get(teamId).add(participantDto);
+                        participants.add(participantDto);
                     });
+
+                    matchDto.setParticipants(participants);
                     return matchDto;
                 }).collect(Collectors.toList());
     }

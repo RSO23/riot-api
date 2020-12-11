@@ -14,4 +14,5 @@ public class ParticipantDto
     public int deaths;
     public int assists;
     public int largestMultiKill;
+    public int teamId;
 }
