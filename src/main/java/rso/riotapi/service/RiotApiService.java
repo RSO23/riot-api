@@ -1,9 +1,9 @@
 package rso.riotapi.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -12,11 +12,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.merakianalytics.orianna.Orianna;
 import com.merakianalytics.orianna.types.common.Region;
+import com.merakianalytics.orianna.types.core.match.Match;
 import com.merakianalytics.orianna.types.core.summoner.Summoner;
 
 import lombok.RequiredArgsConstructor;
@@ -52,7 +54,7 @@ public class RiotApiService
         SummonerDto summonerDto = new SummonerDto();
         summonerDto.setId(summoner.getId());
         summonerDto.setAccountId(summoner.getAccountId());
-        summonerDto.setName(summoner.getName());
+        summonerDto.setUsername(summoner.getName());
         summonerDto.setPuuid(summoner.getPuuid());
         summonerDto.setProfileIconId(summoner.getProfileIcon().getId());
         summonerDto.setSummonerLevel(summoner.getLevel());
@@ -60,50 +62,64 @@ public class RiotApiService
         return summonerDto;
     }
 
-    public MatchlistDto getMatchReferences(String accountId)
+    public MatchlistDto getMatchReferences(String accountId, Integer startIndex, Integer endIndex)
     {
-        // TODO @jakobm Dodaj start/end index
-        String url = createURL(MATCH_LISTS_BY_ENCRYPTED_ACCOUNT_ID_URL, accountId);
-        ResponseEntity<MatchlistDto> response = createRequest(url, MatchlistDto.class);
-        MatchlistDto matchlistDto = response.getBody();
-        matchlistDto.setMatches(Arrays.copyOfRange(matchlistDto.getMatches(), 0, 20));
 
-        return matchlistDto;
+        if (startIndex == null) {
+            startIndex = 0;
+            endIndex = 100;
+        }
+        else if (endIndex == null) {
+            endIndex = startIndex + 100;
+        }
+
+        String url = createURL(MATCH_LISTS_BY_ENCRYPTED_ACCOUNT_ID_URL, accountId);
+        url += String.format("?endIndex=%s&beginIndex=%s", endIndex, startIndex);
+
+        ResponseEntity<MatchlistDto> response = createRequest(url, MatchlistDto.class);
+        return response.getBody();
     }
 
     public List<MatchDto> getMatchByIds(MatchesRegionDto matchesRegionDto)
     {
-        Optional.ofNullable(matchesRegionDto.getRegion())
-                .ifPresentOrElse(Orianna::setDefaultRegion, () -> Orianna.setDefaultRegion(Region.EUROPE_WEST));
+        Region region = Optional.ofNullable(matchesRegionDto.getRegion()).orElse(Region.EUROPE_WEST);
+        Orianna.setDefaultRegion(region);
 
-        return Orianna.matchesWithIds(matchesRegionDto.getMatchIds()).get().stream()
-                .map(match -> {
-                    MatchDto matchDto = new MatchDto();
-                    matchDto.setGameId(match.getId());
-                    matchDto.setDuration(match.getDuration().getStandardSeconds());
-                    ArrayList<ParticipantDto> participants = new ArrayList<>();
+        return matchesRegionDto.getMatchIds().stream()
+                .map(this::getMatchWithIdAsync)
+                .map(CompletableFuture::join)
+                .collect(Collectors.toList());
+    }
 
-                    match.getParticipants().forEach(participant -> {
-                        ParticipantDto participantDto = new ParticipantDto();
-                        participantDto.setChampionId(participant.getChampion().getId());
-                        participantDto.setProfileIcon(participant.getProfileIcon().getId());
-                        participantDto.setKills(participant.getStats().getKills());
-                        participantDto.setAssists(participant.getStats().getAssists());
-                        participantDto.setDeaths(participant.getStats().getDeaths());
-                        participantDto.setLargestMultiKill(participant.getStats().getLargestMultiKill());
-                        participantDto.setWin(participant.getStats().isWinner());
-                        participantDto.setTeamId(participant.getTeam().getSide().getId());
+    @Async
+    public CompletableFuture<MatchDto> getMatchWithIdAsync(Long id) {
+        log.info("Running getMatchWithIdAsync on thread: " + Thread.currentThread().getName());
+        Match match = Orianna.matchWithId(id).get();
 
-                        Summoner summoner = participant.getSummoner();
-                        participantDto.setUsername(summoner.getName());
-                        participantDto.setAccountId(summoner.getAccountId());
+        MatchDto matchDto = new MatchDto();
+        matchDto.setGameId(match.getId());
+        matchDto.setDuration(match.getDuration().getStandardSeconds());
+        ArrayList<ParticipantDto> participants = new ArrayList<>();
 
-                        participants.add(participantDto);
-                    });
+        match.getParticipants().forEach(participant -> {
+            ParticipantDto participantDto = new ParticipantDto();
+            participantDto.setChampionId(participant.getChampion().getId());
+            participantDto.setProfileIcon(participant.getProfileIcon().getId());
+            participantDto.setKills(participant.getStats().getKills());
+            participantDto.setAssists(participant.getStats().getAssists());
+            participantDto.setDeaths(participant.getStats().getDeaths());
+            participantDto.setLargestMultiKill(participant.getStats().getLargestMultiKill());
+            participantDto.setWin(participant.getStats().isWinner());
+            participantDto.setTeamId(participant.getTeam().getSide().getId());
 
-                    matchDto.setParticipants(participants);
-                    return matchDto;
-                }).collect(Collectors.toList());
+            Summoner summoner = participant.getSummoner();
+            participantDto.setUsername(summoner.getName());
+            participantDto.setAccountId(summoner.getAccountId());
+
+            participants.add(participantDto);
+        });
+        matchDto.setParticipants(participants);
+        return CompletableFuture.completedFuture(matchDto);
     }
 
     private String createURL(String url, String parameter)

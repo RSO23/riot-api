@@ -5,14 +5,14 @@ import lombok.Data;
 @Data
 public class ParticipantDto
 {
-    public String username;
-    public String accountId;
-    public int profileIcon;
-    public int championId;
-    public boolean win;
-    public int kills;
-    public int deaths;
-    public int assists;
-    public int largestMultiKill;
-    public int teamId;
+    private String username;
+    private String accountId;
+    private int profileIcon;
+    private int championId;
+    private boolean win;
+    private int kills;
+    private int deaths;
+    private int assists;
+    private int largestMultiKill;
+    private int teamId;
 }

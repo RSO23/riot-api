@@ -2,9 +2,9 @@ package rso.riotapi;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -15,12 +15,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
 
 import com.merakianalytics.orianna.Orianna;
-import com.merakianalytics.orianna.datapipeline.riotapi.RiotAPI;
-import com.merakianalytics.orianna.datastores.mongo.dto.MongoDBDataStore;
-import com.merakianalytics.orianna.types.common.Region;
 
 import lombok.RequiredArgsConstructor;
 import rso.riotapi.config.ConfigRiotApi;
@@ -45,6 +44,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @EnableDiscoveryClient
 @RequiredArgsConstructor
+@EnableAsync
 public class RiotApiApplication {
 
 	private final ConfigRiotApi configRiotApi;
@@ -65,6 +65,17 @@ public class RiotApiApplication {
 		ApplicationContext applicationContext = contextRefreshedEvent.getApplicationContext();
 		MDC.put("applicationName", applicationContext.getId());
 		Orianna.setRiotAPIKey(configRiotApi.getRiotApiKey());
+	}
+
+	@Bean
+	public Executor taskExecutor() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(4);
+		executor.setMaxPoolSize(4);
+		executor.setQueueCapacity(500);
+		executor.setThreadNamePrefix("RiotApi");
+		executor.initialize();
+		return executor;
 	}
 
 	@Bean

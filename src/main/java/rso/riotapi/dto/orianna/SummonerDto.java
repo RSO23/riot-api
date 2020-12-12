@@ -13,8 +13,8 @@ public class SummonerDto
     private String accountId;
     @JsonProperty("puuid")
     private String puuid;
-    @JsonProperty("name")
-    private String name;
+    @JsonProperty("username")
+    private String username;
     @JsonProperty("profileIconId")
     private Integer profileIconId;
     @JsonProperty("summonerLevel")
