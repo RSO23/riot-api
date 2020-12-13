@@ -103,7 +103,7 @@ public class RiotApiService
 
         match.getParticipants().forEach(participant -> {
             ParticipantDto participantDto = new ParticipantDto();
-            participantDto.setChampionId(participant.getChampion().getId());
+            participantDto.setChampion(participant.getChampion().getName());
             participantDto.setProfileIcon(participant.getProfileIcon().getId());
             participantDto.setKills(participant.getStats().getKills());
             participantDto.setAssists(participant.getStats().getAssists());

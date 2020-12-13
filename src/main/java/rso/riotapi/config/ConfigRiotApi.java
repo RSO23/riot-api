@@ -9,5 +9,5 @@ import lombok.Data;
 public class ConfigRiotApi
 {
     private String championRatesUrl = "http://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/championrates.json";
-    private String riotApiKey = "RGAPI-ff5d2225-5f29-47cd-8566-4a1f43ed6820";
+    private String riotApiKey = "insert_riot_api_here";
 }
