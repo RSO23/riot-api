@@ -7,8 +7,9 @@ public class ParticipantDto
 {
     private String username;
     private String accountId;
-    private int profileIcon;
+    private String profileIconUrl;
     private String champion;
+    private String championIconUrl;
     private boolean win;
     private int kills;
     private int deaths;

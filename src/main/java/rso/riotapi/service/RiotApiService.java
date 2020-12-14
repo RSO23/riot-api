@@ -17,8 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.merakianalytics.orianna.Orianna;
+import com.merakianalytics.orianna.types.common.Queue;
 import com.merakianalytics.orianna.types.common.Region;
+import com.merakianalytics.orianna.types.core.league.LeagueEntry;
 import com.merakianalytics.orianna.types.core.match.Match;
+import com.merakianalytics.orianna.types.core.staticdata.Champion;
 import com.merakianalytics.orianna.types.core.summoner.Summoner;
 
 import lombok.RequiredArgsConstructor;
@@ -56,8 +59,17 @@ public class RiotApiService
         summonerDto.setAccountId(summoner.getAccountId());
         summonerDto.setUsername(summoner.getName());
         summonerDto.setPuuid(summoner.getPuuid());
-        summonerDto.setProfileIconId(summoner.getProfileIcon().getId());
+        summonerDto.setProfileIconUrl(summoner.getProfileIcon().getImage().getURL());
         summonerDto.setSummonerLevel(summoner.getLevel());
+
+        LeagueEntry leaguePosition = summoner.getLeaguePosition(Queue.RANKED_SOLO);
+        summonerDto.setDivision(leaguePosition.getDivision().name());
+        summonerDto.setTier(leaguePosition.getTier().name());
+        summonerDto.setLeaguePoints(leaguePosition.getLeaguePoints());
+        summonerDto.setWins(leaguePosition.getWins());
+        summonerDto.setLosses(leaguePosition.getLosses());
+
+
 
         return summonerDto;
     }
@@ -103,8 +115,12 @@ public class RiotApiService
 
         match.getParticipants().forEach(participant -> {
             ParticipantDto participantDto = new ParticipantDto();
-            participantDto.setChampion(participant.getChampion().getName());
-            participantDto.setProfileIcon(participant.getProfileIcon().getId());
+
+            Champion champion = participant.getChampion();
+            participantDto.setChampion(champion.getName());
+            participantDto.setChampionIconUrl(champion.getImage().getURL());
+
+            participantDto.setProfileIconUrl(participant.getProfileIcon().getImage().getURL());
             participantDto.setKills(participant.getStats().getKills());
             participantDto.setAssists(participant.getStats().getAssists());
             participantDto.setDeaths(participant.getStats().getDeaths());
