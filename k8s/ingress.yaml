@@ -35,3 +35,7 @@ spec:
             backend:
               serviceName: prediction-catalogue
               servicePort: 8086
+          - path: /frontend(/|$)(.*)
+            backend:
+              serviceName: frontend
+              servicePort: 8087
