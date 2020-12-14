@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import rso.riotapi.config.ConfigProperties;
+import rso.riotapi.config.ConfigRiotApi;
 import rso.riotapi.dto.orianna.MatchDto;
 import rso.riotapi.dto.requests.MatchesRegionDto;
 import rso.riotapi.dto.riotApi.MatchlistDto;
@@ -33,6 +34,8 @@ public class RiotApiController
 
     private final ConfigProperties configProperties;
 
+    private final ConfigRiotApi configRiotApi;
+
     private final RiotApiService riotApiService;
 
     @GetMapping("/ping")
@@ -44,6 +47,11 @@ public class RiotApiController
     @GetMapping("/config")
     public String testConfig() {
         return configProperties.getTestConfig();
+    }
+
+    @GetMapping("/riot")
+    public String checkApiKey() {
+        return configRiotApi.getRiotApiKey();
     }
 
     @PostMapping("/summoner")
