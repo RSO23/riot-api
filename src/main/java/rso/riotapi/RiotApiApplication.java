@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -47,6 +49,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableAsync
 public class RiotApiApplication {
 
+	private final Logger log = LoggerFactory.getLogger(RiotApiApplication.class);
 	private final ConfigRiotApi configRiotApi;
 
 	@Bean
@@ -65,6 +68,7 @@ public class RiotApiApplication {
 		ApplicationContext applicationContext = contextRefreshedEvent.getApplicationContext();
 		MDC.put("applicationName", applicationContext.getId());
 		Orianna.setRiotAPIKey(configRiotApi.getRiotApiKey());
+		log.info("Riot api key changed to: " + configRiotApi.getRiotApiKey());
 	}
 
 	@Bean
