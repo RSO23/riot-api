@@ -19,6 +19,10 @@ spring:
     loadbalancer:
       ribbon:
         enabled: true
+    consul:
+      config:
+        watch:
+          wait-time: 10
 
 # Show details of health endpoint
 management:
