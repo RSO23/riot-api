@@ -63,7 +63,7 @@ public class RiotApiService
         summonerDto.setSummonerLevel(summoner.getLevel());
 
         LeagueEntry leaguePosition = summoner.getLeaguePosition(Queue.RANKED_SOLO);
-        if (leaguePosition.getDivision() != null) {
+        if (leaguePosition != null) {
             summonerDto.setDivision(leaguePosition.getDivision().name());
             summonerDto.setTier(leaguePosition.getTier().name());
             summonerDto.setLeaguePoints(leaguePosition.getLeaguePoints());
