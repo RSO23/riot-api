@@ -63,13 +63,20 @@ public class RiotApiService
         summonerDto.setSummonerLevel(summoner.getLevel());
 
         LeagueEntry leaguePosition = summoner.getLeaguePosition(Queue.RANKED_SOLO);
-        summonerDto.setDivision(leaguePosition.getDivision().name());
-        summonerDto.setTier(leaguePosition.getTier().name());
-        summonerDto.setLeaguePoints(leaguePosition.getLeaguePoints());
-        summonerDto.setWins(leaguePosition.getWins());
-        summonerDto.setLosses(leaguePosition.getLosses());
-
-
+        if (leaguePosition.getDivision() != null) {
+            summonerDto.setDivision(leaguePosition.getDivision().name());
+            summonerDto.setTier(leaguePosition.getTier().name());
+            summonerDto.setLeaguePoints(leaguePosition.getLeaguePoints());
+            summonerDto.setWins(leaguePosition.getWins());
+            summonerDto.setLosses(leaguePosition.getLosses());
+        }
+        else {
+            summonerDto.setDivision("Unranked");
+            summonerDto.setTier("Unranked");
+            summonerDto.setLeaguePoints(0);
+            summonerDto.setWins(0);
+            summonerDto.setLosses(0);
+        }
 
         return summonerDto;
     }
