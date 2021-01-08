@@ -51,6 +51,7 @@ public class RiotApiService
 
         Region region = Optional.ofNullable(usernameRegionDto.getRegion()).orElse(Region.EUROPE_WEST);
         Orianna.setDefaultRegion(region);
+        Orianna.setRiotAPIKey(configRiotApi.getRiotApiKey());
 
         Summoner summoner = Orianna.summonerNamed(usernameRegionDto.getUsername()).get();
 
@@ -103,6 +104,7 @@ public class RiotApiService
     {
         Region region = Optional.ofNullable(matchesRegionDto.getRegion()).orElse(Region.EUROPE_WEST);
         Orianna.setDefaultRegion(region);
+        Orianna.setRiotAPIKey(configRiotApi.getRiotApiKey());
 
         return matchesRegionDto.getMatchIds().stream()
                 .map(this::getMatchWithIdAsync)
@@ -113,6 +115,7 @@ public class RiotApiService
     @Async
     public CompletableFuture<MatchDto> getMatchWithIdAsync(Long id) {
         log.info("Running getMatchWithIdAsync on thread: " + Thread.currentThread().getName());
+        Orianna.setRiotAPIKey(configRiotApi.getRiotApiKey());
         Match match = Orianna.matchWithId(id).get();
 
         MatchDto matchDto = new MatchDto();
